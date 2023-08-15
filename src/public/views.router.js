@@ -18,39 +18,38 @@ document.getElementById("product-form").addEventListener("submit", (e) => {
 })
 
 
-//Inyectar en html
-function appendProduct(data) {
+//Recibir productos e inyectarlo en el html.
+socket.on("productsList", (data) => {
+
     const productList = document.getElementById("products-list")
     const productElement = document.createElement("div")
     productElement.innerHTML = ""
 
-    data.forEach((p) => {
-        productElement.innerHTML =
-            `
-                <h2>${p.title}</h2>
-                <p> <strong>ID:</strong> ${p.id}</p> 
-                <p> <strong>Descripción:</strong> ${p.description}</p>
-                <p> <strong>Code:</strong> ${p.code}</p>
-                <p> <strong>Price:</strong> ${p.price}</p>
-                <p> <strong>Status:</strong> ${p.status}</p>
-                <p> <strong>Stock:</strong> ${p.stock}</p>
-                <p> <strong>Category:</strong> ${p.category}</p>
-                <button id="btnRemove${p.id}">Eliminar</button>
+    if (!data) {
+        productElement.innerHTML = ""
+    } else {
+        data.forEach((p) => {
+            productElement.innerHTML =
                 `
-        productList.appendChild(productElement)
+                    <h2>${p.title}</h2>
+                    <p> <strong>ID:</strong> ${p.id}</p> 
+                    <p> <strong>Descripción:</strong> ${p.description}</p>
+                    <p> <strong>Code:</strong> ${p.code}</p>
+                    <p> <strong>Price:</strong> ${p.price}</p>
+                    <p> <strong>Status:</strong> ${p.status}</p>
+                    <p> <strong>Stock:</strong> ${p.stock}</p>
+                    <p> <strong>Category:</strong> ${p.category}</p>
+                    <button id="btnRemove${p.id}">Eliminar</button>
+                    `
+            productList.appendChild(productElement)
 
-        const btnRemove = document.getElementById(`btnRemove${p.id}`)
+            const btnRemove = document.getElementById(`btnRemove${p.id}`)
 
-        btnRemove.addEventListener("click", () => {
-            socket.emit("deleteProduct", p.id)
-            productElement.innerHTML = ""
-        })
-    });
-
-}
-
-
-//Recibir productos desde el servidor
-socket.on("productsList", (products) => {
-    appendProduct(products)
+            //Socket para enviar el id del producto a eliminar (CORREGIR)
+            btnRemove.addEventListener("click", () => {
+                socket.emit("deleteProduct", p.id)
+                productElement.innerHTML = ""
+            })
+        });
+    }
 })
